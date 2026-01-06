@@ -34,29 +34,17 @@ class InstallationPointForm
                     ->rows(3)
                     ->columnSpanFull(),
 
-                Map::make('location')
+                \App\Filament\Forms\Components\CustomLeafletMap::make('location')
                     ->label('Pilih Lokasi di Peta (Klik untuk Pin)')
-                    ->mapControls([
-                        'mapTypeControl' => true,
-                        'scaleControl' => true,
-                        'streetViewControl' => true,
-                        'rotateControl' => true,
-                        'fullscreenControl' => true,
-                        'searchBoxControl' => true,
-                        'zoomControl' => true,
-                    ])
-                    ->height('450px')
                     ->defaultLocation([0.9167, 104.4500])
                     ->defaultZoom(13)
                     ->columnSpanFull()
-                    ->clickable()
-                    ->draggable()
-                    ->debug() // Enable debug mode for visibility
-                    ->dehydrated(false)
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set) {
-                        $set('latitude', $state['lat']);
-                        $set('longitude', $state['lng']);
+                        if (isset($state['lat']) && isset($state['lng'])) {
+                            $set('latitude', $state['lat']);
+                            $set('longitude', $state['lng']);
+                        }
                     }),
 
                 TextInput::make('latitude')

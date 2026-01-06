@@ -29,7 +29,17 @@ class RecentUpdates extends BaseWidget
                 Tables\Columns\TextColumn::make('percentage')
                     ->label('Progress')
                     ->suffix('%')
-                    ->badge(),
+                    ->badge()->color(function ($state) {
+                        if ($state == 100) {
+                            return 'success'; // hijau
+                        }
+
+                        if ($state >= 50) {
+                            return 'warning'; // oren
+                        }
+
+                        return 'danger'; // merah (0–49)
+                    }),
                 Tables\Columns\TextColumn::make('description')
                     ->label('Keterangan')
                     ->limit(50),

@@ -18,7 +18,11 @@ class MaintenanceRecordResource extends Resource
 {
     protected static ?string $model = MaintenanceRecord::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?string $navigationLabel = 'Riwayat Perbaikan';
+    protected static ?string $pluralLabel = 'Riwayat Perbaikan';
+    protected static ?string $modelLabel = 'Riwayat Perbaikan';
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Clock;
 
     public static function form(Schema $schema): Schema
     {

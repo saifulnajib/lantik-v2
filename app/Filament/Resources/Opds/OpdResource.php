@@ -19,8 +19,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class OpdResource extends Resource
 {
     protected static ?string $model = Opd::class;
+    protected static ?string $navigationLabel = 'OPD';
+    protected static ?string $pluralLabel = 'OPD';
+    protected static ?string $modelLabel = 'OPD';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::BuildingOffice2;
 
     public static function form(Schema $schema): Schema
     {

@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
             --primary: #3b82f6;
@@ -336,72 +338,70 @@
         &copy; {{ date('Y') }} Dinas Komunikasi dan Informatika Kota Tanjungpinang.
     </footer>
 
-    <script src="{{ \Cheesegrits\FilamentGoogleMaps\Helpers\MapsHelper::mapsUrl() }}"></script>
+    <!-- Map implementation moved to inline script -->
     <script>
         const points = @json($points);
         let map;
         let markers = [];
-        let infoWindow;
 
         function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: 0.9165, lng: 104.4556 },
-                zoom: 12,
-                mapId: "DEMO_MAP_ID", // Optional
-                mapTypeId: google.maps.MapTypeId.ROADMAP,
-                styles: [
-                    { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }
-                ]
-            });
+            // Center on Tanjungpinang
+            map = L.map('map').setView([0.9165, 104.4556], 12);
 
-            infoWindow = new google.maps.InfoWindow();
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
 
             // Create all markers initially
             createMarkers(points);
         }
 
-        function getMarkerIcon(status) {
-            let color = '#ea4335';
+        function getMarkerColor(status) {
             switch (status) {
-                case 'pending': color = '#9ca3af'; break; // Gray
-                case 'in_progress': color = '#3b82f6'; break; // Blue
-                case 'completed': color = '#22c55e'; break; // Green
-                case 'maintenance': color = '#eab308'; break; // Yellow
+                case 'pending': return '#94a3b8'; // Gray
+                case 'in_progress': return '#3b82f6'; // Blue
+                case 'completed': return '#22c55e'; // Green
+                case 'maintenance': return '#f59e0b'; // Amber/Orange
+                default: return '#ef4444'; // Red
             }
-
-            return {
-                path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
-                fillColor: color,
-                fillOpacity: 1,
-                strokeWeight: 1,
-                strokeColor: '#ffffff',
-                scale: 1.5,
-                anchor: new google.maps.Point(12, 22),
-            };
         }
 
         function createMarkers(data) {
             // Clear existing markers
-            markers.forEach(m => m.setMap(null));
+            markers.forEach(m => map.removeLayer(m));
             markers = [];
 
             data.forEach(p => {
                 if (!p.lat || !p.lng) return;
 
-                const marker = new google.maps.Marker({
-                    position: { lat: parseFloat(p.lat), lng: parseFloat(p.lng) },
-                    map: map,
-                    title: p.nama,
-                    icon: getMarkerIcon(p.status)
+                const markerColor = getMarkerColor(p.status);
+                
+                // SVG Pin Shape
+                const svgIcon = `
+                    <svg width="30" height="42" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 0C6.71573 0 0 6.71573 0 15C0 26.25 15 42 15 42C15 42 30 26.25 30 15C30 6.71573 23.2843 0 15 0ZM15 20.625C11.8934 20.625 9.375 18.1066 9.375 15C9.375 11.8934 11.8934 9.375 15 9.375C18.1066 9.375 20.625 11.8934 20.625 15C20.625 18.1066 18.1066 20.625 15 20.625Z" fill="${markerColor}" stroke="white" stroke-width="2"/>
+                    </svg>
+                `;
+
+                const customIcon = L.divIcon({
+                    className: 'custom-pin-icon',
+                    html: svgIcon,
+                    iconSize: [30, 42],
+                    iconAnchor: [15, 42], // Pointy end at the bottom center
+                    popupAnchor: [0, -40]
                 });
+
+                const marker = L.marker([parseFloat(p.lat), parseFloat(p.lng)], {
+                    icon: customIcon,
+                    title: p.nama
+                }).addTo(map);
 
                 // Attach data for filtering
                 marker.data = p;
 
-                marker.addListener('click', () => {
-                    const contentString = `
-                    <div style="font-family: 'Outfit', sans-serif; padding: 5px;">
-                        <strong style="color: #64748b;font-size: 1.1rem; display: block; margin-bottom: 0.5rem">${p.nama}</strong>
+                const contentString = `
+                    <div style="font-family: 'Outfit', sans-serif; padding: 5px; color: #1e293b; min-width: 150px">
+                        <strong style="color: #1e293b; font-size: 1.1rem; display: block; margin-bottom: 0.5rem">${p.nama}</strong>
                         <span style="color: #64748b; font-size: 0.875rem">${p.opd}</span>
                         <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem">
                             <span class="badge" style="background: #f1f5f9; color: #334155; padding: 2px 8px; border-radius: 99px; font-size: 0.7rem; font-weight: bold;">
@@ -410,11 +410,9 @@
                             <strong style="color: #3b82f6">${p.percentage}%</strong>
                         </div>
                     </div>
-                   `;
-                    infoWindow.setContent(contentString);
-                    infoWindow.open(map, marker);
-                });
-
+                `;
+                
+                marker.bindPopup(contentString);
                 markers.push(marker);
             });
         }
@@ -431,9 +429,13 @@
                 const matchSearch = p.nama.toLowerCase().includes(search);
 
                 if (matchOpd && matchStatus && matchSearch) {
-                    marker.setMap(map);
+                    if (!map.hasLayer(marker)) {
+                        marker.addTo(map);
+                    }
                 } else {
-                    marker.setMap(null);
+                    if (map.hasLayer(marker)) {
+                        map.removeLayer(marker);
+                    }
                 }
             });
         }
@@ -442,13 +444,8 @@
         document.getElementById('status-filter').addEventListener('change', filterData);
         document.getElementById('search-input').addEventListener('input', filterData);
 
-        // Init map when Google API is ready
-        window.initGoogleMaps = initMap;
-
-        // Check if google is already loaded/defined slightly later if callback doesn't fire
-        if (typeof google !== 'undefined' && typeof google.maps !== 'undefined') {
-            initMap();
-        }
+        // Initialize map
+        initMap();
     </script>
 </body>
 
