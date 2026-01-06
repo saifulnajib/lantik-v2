@@ -11,6 +11,8 @@ class StatusChart extends ChartWidget
 
     protected ?string $heading = 'Distribusi Status Pemasangan';
 
+    protected int|string|array $columnSpan = '1/2';
+
     protected function getData(): array
     {
         $data = InstallationPoint::groupBy('status')

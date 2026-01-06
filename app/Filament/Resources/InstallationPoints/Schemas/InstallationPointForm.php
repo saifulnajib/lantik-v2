@@ -62,6 +62,13 @@ class InstallationPointForm
                     ->dehydrated()
                     ->columnSpan(1),
 
+                TextInput::make('jumlah_ap')
+                    ->label('Jumlah Access Point')
+                    ->numeric()
+                    ->default(0)
+                    ->required()
+                    ->columnSpan(1),
+
                 Select::make('priority')
                     ->label('Prioritas')
                     ->options([
@@ -91,7 +98,7 @@ class InstallationPointForm
                     ->label('Target Selesai')
                     ->native(false)
                     ->displayFormat('d/m/Y')
-                    ->columnSpan(2),
+                    ->columnSpan(1),
 
                 Textarea::make('notes')
                     ->label('Catatan')

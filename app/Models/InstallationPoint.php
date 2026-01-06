@@ -20,6 +20,7 @@ class InstallationPoint extends Model
         'target_completion_date',
         'notes',
         'location',
+        'jumlah_ap',
     ];
 
     protected $appends = [

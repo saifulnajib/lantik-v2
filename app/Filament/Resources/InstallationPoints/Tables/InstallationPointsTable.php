@@ -18,8 +18,12 @@ class InstallationPointsTable
     {
         return $table
             ->columns([
+                TextColumn::make('opd.kode')
+                    ->label('Kode OPD')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('opd.nama')
-                    ->label('OPD')
+                    ->label('Nama OPD')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('nama_lokasi')
@@ -57,6 +61,11 @@ class InstallationPointsTable
                         'maintenance' => 'warning',
                         default => 'gray',
                     })
+                    ->sortable(),
+                TextColumn::make('jumlah_ap')
+                    ->label('AP')
+                    ->badge()
+                    ->color('info')
                     ->sortable(),
                 TextColumn::make('target_completion_date')
                     ->label('Target Selesai')

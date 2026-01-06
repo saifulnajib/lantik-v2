@@ -52,4 +52,9 @@ class InstallationPointResource extends Resource
             'import' => ImportInstallationPoints::route('/import'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
 }
