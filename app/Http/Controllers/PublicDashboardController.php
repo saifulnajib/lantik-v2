@@ -40,4 +40,9 @@ class PublicDashboardController extends Controller
 
         return view('public-dashboard', compact('stats', 'points', 'recentUpdates', 'opds'));
     }
+
+    public function comingSoon()
+    {
+        return view('coming-soon');
+    }
 }
