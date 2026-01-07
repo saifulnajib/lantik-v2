@@ -30,9 +30,32 @@
 
                 this.map = L.map(this.$refs.map).setView([initialLat, initialLng], {{ $field->getDefaultZoom() }});
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href=&quot;https://www.openstreetmap.org/copyright&quot;>OpenStreetMap</a> contributors'
-                }).addTo(this.map);
+                const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href=\'https://www.openstreetmap.org/copyright\'>OpenStreetMap</a> contributors'
+                });
+
+                const satellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                    maxZoom: 20,
+                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                    attribution: '&copy; Google'
+                });
+
+                const hybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                    maxZoom: 20,
+                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                    attribution: '&copy; Google'
+                });
+
+                const baseMaps = {
+                    'Street': osm,
+                    'Satellite': satellite,
+                    'Hybrid': hybrid
+                };
+
+                // Default to Hybrid
+                hybrid.addTo(this.map);
+
+                L.control.layers(baseMaps).addTo(this.map);
 
                 // Add existing marker if latitude/longitude exist
                 if (initialLat && initialLng) {
