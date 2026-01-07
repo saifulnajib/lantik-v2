@@ -13,11 +13,11 @@ class ListOpds extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\Action::make('import')
-                ->label('Import Data')
-                ->url(\App\Filament\Resources\InstallationPoints\InstallationPointResource::getUrl('import', ['type' => 'opd']))
-                ->icon('heroicon-o-arrow-up-tray')
-                ->color('info'),
+            // \Filament\Actions\Action::make('import')
+            //     ->label('Import Data')
+            //     ->url(\App\Filament\Resources\InstallationPoints\InstallationPointResource::getUrl('import', ['type' => 'opd']))
+            //     ->icon('heroicon-o-arrow-up-tray')
+            //     ->color('info'),
             CreateAction::make(),
         ];
     }

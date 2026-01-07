@@ -13,11 +13,11 @@ class ListInstallationPoints extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\Action::make('import')
-                ->label('Import Data')
-                ->url(static::getResource()::getUrl('import'))
-                ->icon('heroicon-o-arrow-up-tray')
-                ->color('info'),
+            // \Filament\Actions\Action::make('import')
+            //     ->label('Import Data')
+            //     ->url(static::getResource()::getUrl('import'))
+            //     ->icon('heroicon-o-arrow-up-tray')
+            //     ->color('info'),
             CreateAction::make(),
         ];
     }

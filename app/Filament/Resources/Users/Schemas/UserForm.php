@@ -21,11 +21,16 @@ class UserForm
                     ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(255),
-                \Filament\Forms\Components\Select::make('roles')
-                    ->relationship('roles', 'name')
-                    ->multiple()
-                    ->preload()
-                    ->searchable(),
+                \Filament\Forms\Components\Select::make('role')
+                    ->label('Role')
+                    ->options([
+                        'super_admin' => 'Super Admin',
+                        'admin' => 'Admin',
+                        'vendor' => 'Vendor',
+                        'opd' => 'OPD',
+                    ])
+                    ->required()
+                    ->default('vendor'),
                 TextInput::make('password')
                     ->password()
                     ->dehydrateStateUsing(fn($state) => \Illuminate\Support\Facades\Hash::make($state))

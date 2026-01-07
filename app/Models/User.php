@@ -14,6 +14,15 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasPanelShield;
 
+    protected static function booted()
+    {
+        static::saving(function ($user) {
+            if ($user->isDirty('role') && filled($user->role)) {
+                $user->syncRoles([$user->role]);
+            }
+        });
+    }
+
     /**
      * The attributes that are mass assignable.
      *
