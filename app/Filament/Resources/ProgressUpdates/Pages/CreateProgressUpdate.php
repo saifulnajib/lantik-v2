@@ -8,4 +8,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateProgressUpdate extends CreateRecord
 {
     protected static string $resource = ProgressUpdateResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }
