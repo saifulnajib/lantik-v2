@@ -335,7 +335,7 @@
     </div>
 
     <footer>
-        &copy; {{ date('Y') }} Dinas Komunikasi dan Informatika Kota Tanjungpinang.
+        &copy; {{ date('Y') }} yang bikin Saiful Najib
     </footer>
 
     <!-- Map implementation moved to inline script -->
@@ -375,7 +375,7 @@
                 if (!p.lat || !p.lng) return;
 
                 const markerColor = getMarkerColor(p.status);
-                
+
                 // SVG Pin Shape
                 const svgIcon = `
                     <svg width="30" height="42" viewBox="0 0 30 42" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -411,7 +411,7 @@
                         </div>
                     </div>
                 `;
-                
+
                 marker.bindPopup(contentString);
                 markers.push(marker);
             });
