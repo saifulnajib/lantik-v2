@@ -33,6 +33,11 @@ class StatsOverview extends BaseWidget
                 ->description('Organisasi terdaftar')
                 ->descriptionIcon('heroicon-m-building-office-2')
                 ->color('info'),
+
+            Stat::make('Total AP', InstallationPoint::sum('jumlah_ap'))
+                ->description('Total Access Point')
+                ->descriptionIcon('heroicon-m-wifi')
+                ->color('warning'),
         ];
     }
 }
