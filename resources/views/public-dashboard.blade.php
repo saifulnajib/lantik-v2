@@ -261,19 +261,19 @@
     <div class="container">
         <div class="stats-grid">
             <div class="stat-card">
-                <span class="value">{{ $stats['total'] }}</span>
+                <span class="value" id="stat-total">{{ $stats['total'] }}</span>
                 <span class="label">Total Titik</span>
             </div>
             <div class="stat-card" style="color: var(--success)">
-                <span class="value">{{ $stats['completed'] }}</span>
+                <span class="value" id="stat-completed">{{ $stats['completed'] }}</span>
                 <span class="label">Selesai</span>
             </div>
             <div class="stat-card" style="color: var(--primary)">
-                <span class="value">{{ $stats['in_progress'] }}</span>
+                <span class="value" id="stat-in_progress">{{ $stats['in_progress'] }}</span>
                 <span class="label">Proses</span>
             </div>
             <div class="stat-card" style="color: var(--warning)">
-                <span class="value">{{ $stats['pending'] }}</span>
+                <span class="value" id="stat-pending">{{ $stats['pending'] }}</span>
                 <span class="label">Pending</span>
             </div>
         </div>
@@ -348,9 +348,32 @@
             // Center on Tanjungpinang
             map = L.map('map').setView([0.9165, 104.4556], 12);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            });
+
+            const satellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; Google'
+            });
+
+            const hybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; Google'
+            });
+
+            const baseMaps = {
+                "Street": osm,
+                "Satellite": satellite,
+                "Hybrid": hybrid
+            };
+
+            // Default to Hybrid
+            hybrid.addTo(map);
+
+            L.control.layers(baseMaps).addTo(map);
 
             // Create all markers initially
             createMarkers(points);
@@ -401,7 +424,7 @@
 
                 const contentString = `
                     <div style="font-family: 'Outfit', sans-serif; padding: 5px; color: #1e293b; min-width: 150px">
-                        <strong style="color: #1e293b; font-size: 1.1rem; display: block; margin-bottom: 0.5rem">${p.nama}</strong>
+                        <strong style="color: #838588ff; font-size: 1.1rem; display: block; margin-bottom: 0.5rem">${p.nama}</strong>
                         <span style="color: #64748b; font-size: 0.875rem">${p.opd}</span>
                         <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem">
                             <span class="badge" style="background: #f1f5f9; color: #334155; padding: 2px 8px; border-radius: 99px; font-size: 0.7rem; font-weight: bold;">
@@ -422,6 +445,13 @@
             const status = document.getElementById('status-filter').value;
             const search = document.getElementById('search-input').value.toLowerCase();
 
+            let counts = {
+                total: 0,
+                completed: 0,
+                in_progress: 0,
+                pending: 0
+            };
+
             markers.forEach(marker => {
                 const p = marker.data;
                 const matchOpd = opdId === 'all' || p.opd_id == opdId;
@@ -432,12 +462,22 @@
                     if (!map.hasLayer(marker)) {
                         marker.addTo(map);
                     }
+                    counts.total++;
+                    if (counts.hasOwnProperty(p.status)) {
+                        counts[p.status]++;
+                    }
                 } else {
                     if (map.hasLayer(marker)) {
                         map.removeLayer(marker);
                     }
                 }
             });
+
+            // Update stats UI
+            document.getElementById('stat-total').textContent = counts.total;
+            document.getElementById('stat-completed').textContent = counts.completed;
+            document.getElementById('stat-in_progress').textContent = counts.in_progress;
+            document.getElementById('stat-pending').textContent = counts.pending;
         }
 
         document.getElementById('opd-filter').addEventListener('change', filterData);
