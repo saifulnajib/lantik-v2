@@ -41,8 +41,18 @@ class PublicDashboardController extends Controller
         return view('public-dashboard', compact('stats', 'points', 'recentUpdates', 'opds'));
     }
 
-    public function landing()
+    public function landing(Request $request)
     {
-        return view('landing');
+        $search = $request->query('q');
+
+        $layanans = \App\Models\Layanan::query()
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->orderBy('order')
+            ->get();
+
+        return view('landing', compact('layanans', 'search'));
     }
 }

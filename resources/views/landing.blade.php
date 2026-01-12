@@ -84,7 +84,7 @@
         /* Hero Section */
         .hero {
             text-align: center;
-            padding: 4rem 0 6rem;
+            padding: 1rem 0 2rem;
             animation: fadeIn 0.8s ease-out;
         }
 
@@ -222,6 +222,50 @@
             transform: translateX(4px);
             transition: transform 0.3s ease;
         }
+
+        /* Search Section */
+        .search-section {
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 0.1rem;
+            background: white;
+            padding: 0.1rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 9999px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
@@ -243,65 +287,52 @@
             <p>Gerbang utama layanan teknologi informasi dan komunikasi terintegrasi untuk Kota Tanjungpinang.</p>
         </section>
 
+        <section class="search-section">
+            <form action="/" method="GET" class="search-form">
+                <input type="text" name="q" value="{{ $search }}" placeholder="Cari layanan..." class="search-input">
+                <button type="submit" class="search-btn">
+                    <i data-lucide="Search" size="20"></i>
+                </button>
+            </form>
+        </section>
+
         <div class="services-grid">
-            <!-- MONJA -->
-            <a href="/public-info" class="service-card">
-                <div class="badge active">Service Active</div>
-                <div class="icon-box">
-                    <i data-lucide="Activity" size="32"></i>
+            @forelse($layanans as $layanan)
+                @if ($layanan->is_active)
+                    <a href="{{ $layanan->url }}" class="service-card">
+                        <div class="badge active">Service Active</div>
+                        <div class="icon-box">
+                            <i data-lucide="{{ $layanan->icon ?: 'Zap' }}" size="32"></i>
+                        </div>
+                        <div>
+                            <h3>{{ $layanan->name }}</h3>
+                            <p>{{ $layanan->description }}</p>
+                        </div>
+                        <div class="btn-arrow">
+                            Buka <i data-lucide="ArrowRight" size="18"></i>
+                        </div>
+                    </a>
+                @else
+                    <div class="service-card coming-soon">
+                        <div class="badge">Soon</div>
+                        <div class="icon-box">
+                            <i data-lucide="{{ $layanan->icon ?: 'Zap' }}" size="32"></i>
+                        </div>
+                        <div>
+                            <h3>{{ $layanan->name }}</h3>
+                            <p>{{ $layanan->description }}</p>
+                        </div>
+                    </div>
+                @endif
+            @empty
+                <div style="grid-column: 1/-1; text-align: center; padding: 4rem 0; color: var(--text-muted);">
+                    <i data-lucide="Info" size="48" style="margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Tidak ada layanan yang ditemukan untuk pencarian "{{ $search }}"</p>
+                    <a href="/"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600; margin-top: 1rem; display: inline-block;">Hapus
+                        Pencarian</a>
                 </div>
-                <div>
-                    <h3>MONJA</h3>
-                    <p>Monitoring Jaringan. Pantau ketersediaan dan status titik akses internet secara realtime.</p>
-                </div>
-                <div class="btn-arrow">
-                    Buka Dashboard <i data-lucide="ArrowRight" size="18"></i>
-                </div>
-            </a>
-
-            <!-- SIPA -->
-            <a href="https://sipa.kominfo.tanjungpinangkota.go.id" target="_blank" class="service-card">
-                <div class="badge active">Service Active</div>
-                <div class="icon-box">
-                    <i data-lucide="Activity" size="32"></i>
-                </div>
-                <div>
-                    <h3>SIPA</h3>
-                    <p>Sistem Informasi Pendataan Aplikasi. Kelola Aplikasi Umum dan Aplikasi Khusus di Lingkungan
-                        Pemerintah Kota Tanjungpinang</p>
-                </div>
-                <div class="btn-arrow">
-                    Buka <i data-lucide="ArrowRight" size="18"></i>
-                </div>
-            </a>
-
-            <!-- JAVIDCON -->
-            <a href="https://javidcon.kominfo.tanjungpinangkota.go.id" target="_blank" class="service-card">
-                <div class="badge active">Service Active</div>
-                <div class="icon-box">
-                    <i data-lucide="Activity" size="32"></i>
-                </div>
-                <div>
-                    <h3>JAVIDCON</h3>
-                    <p>Jadwal Video Conference. Pengajuan permintaan fasilitasi dan penjadwalan video conference dan
-                        livestreaming</p>
-                </div>
-                <div class="btn-arrow">
-                    Buka <i data-lucide="ArrowRight" size="18"></i>
-                </div>
-            </a>
-
-            <!-- HELP DESK -->
-            <div class="service-card coming-soon">
-                <div class="badge">Soon</div>
-                <div class="icon-box">
-                    <i data-lucide="LifeBuoy" size="32"></i>
-                </div>
-                <div>
-                    <h3>HELP DESK</h3>
-                    <p>Pusat bantuan teknis untuk penanganan kendala infrastruktur dan layanan TIK.</p>
-                </div>
-            </div>
+            @endforelse
         </div>
 
         <footer>
