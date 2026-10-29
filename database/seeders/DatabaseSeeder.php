@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             OpdSeeder::class,
             LayananPermissionSeeder::class,
+            DataCenterMonitoringPermissionSeeder::class,
         ]);
     }
 }
