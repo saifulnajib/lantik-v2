@@ -20,6 +20,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
+use Filament\Schemas\Components\Grid;
 
 class ApplicationForm
 {
@@ -57,6 +58,7 @@ class ApplicationForm
                                         true => 'Ya',
                                         false => 'Tidak',
                                     ])
+                                    ->required()
                                     ->default(true),
 
                                 TextInput::make('name')
@@ -70,13 +72,15 @@ class ApplicationForm
                                     ->numeric()
                                     ->minValue(1990)
                                     ->maxValue((int) date('Y') + 1)
-                                    ->default((int) date('Y')),
+                                    ->default((int) date('Y'))
+                                    ->required(),
 
                                 Textarea::make('description')
                                     ->label('Deskripsi Singkat Aplikasi')
                                     ->rows(3)
                                     ->columnSpan(2)
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->required(),
 
                                 Textarea::make('legal_basis')
                                     ->label('Regulasi / Dasar Hukum')
@@ -103,13 +107,15 @@ class ApplicationForm
                                     ->label('Penyedia Aplikasi')
                                     ->placeholder('Contoh: Diskominfo / Nama Perusahaan')
                                     ->columnSpan(2)
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->required(),
 
                                 TextInput::make('developer_name')
                                     ->label('Pengembang Aplikasi')
                                     ->placeholder('Nama Tim / Perusahaan Pengembang')
                                     ->columnSpan(2)
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->required(),
                             ]),
 
                         Tab::make('Infrastruktur & Integrasi')
@@ -130,6 +136,7 @@ class ApplicationForm
                                 TextInput::make('programming_languages')
                                     ->label('Bahasa Pemrograman / Framework')
                                     ->placeholder('Contoh: PHP (Laravel), JavaScript (Vue), Golang')
+                                    ->required()
                                     ->maxLength(255),
 
                                 TextInput::make('domain_url')
@@ -142,7 +149,8 @@ class ApplicationForm
                                     ->relationship('databaseSystem', 'name')
                                     ->searchable()
                                     ->preload()
-                                    ->live(),
+                                    ->live()
+                                    ->required(),
 
                                 TextInput::make('other_database')
                                     ->label('DBMS Lainnya (Jika pilih Lainnya)')
@@ -153,6 +161,7 @@ class ApplicationForm
                                     ->label('Lokasi Penempatan Server / Hosting')
                                     ->relationship('hostingLocation', 'name')
                                     ->searchable()
+                                    ->required()
                                     ->preload(),
                                 Select::make('integration_status')
                                     ->label('Ketersediaan Integrasi Sistem')
@@ -188,28 +197,51 @@ class ApplicationForm
                                 Textarea::make('business_process_name')
                                     ->label('Nama / Uraian Proses Bisnis')
                                     ->rows(3)
-                                    ->placeholder('Masukkan nama Proses Bisnis OPD yang menjadi acuan untuk digitalisasi pada aplikasi ini'),
+                                    ->placeholder('Masukkan nama Proses Bisnis OPD yang menjadi acuan untuk digitalisasi pada aplikasi ini')
+                                    ->required(),
+                                Grid::make([
+                                    'default' => 1,
+                                ])->schema([
+                                            FileUpload::make('business_process_file_path')
+                                                ->label('Dokumen Proses Bisnis')
+                                                ->disk('local')
+                                                ->visibility('private')
+                                                ->directory('applications/probis')
+                                                ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                                                ->maxSize(5120)
+                                                ->openable(false)
+                                                ->required(),
 
-                                FileUpload::make('business_process_file_path')
-                                    ->label('Dokumen Proses Bisnis')
-                                    ->disk('local')
-                                    ->visibility('private')
-                                    ->directory('applications/probis')
-                                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
-                                    ->maxSize(5120)
-                                    ->openable(false)
-                                    ->downloadable(false),
+                                            Placeholder::make('business_process_files_links')
+                                                ->label('Lihat File Proses Bisnis')
+                                                ->visible(fn(?Application $record) => $record && filled($record->business_process_file_path))
+                                                ->content(function (?Application $record): HtmlString {
+                                                    if (!$record) {
+                                                        return new HtmlString('-');
+                                                    }
+                                                    $links = [];
+
+                                                    if (filled($record->business_process_file_path)) {
+                                                        $url = route('applications.files.show', ['application' => $record->id, 'type' => 'business-process']);
+                                                        $links[] = '<a href="' . e($url) . '" target="_blank" class="text-primary-600 underline font-medium">[' . e(basename($record->business_process_file_path)) . ']</a>';
+                                                    }
+                                                    return new HtmlString(implode(' &nbsp;|&nbsp; ', $links));
+                                                })
+                                                ->columnSpanFull(),
+                                        ]),
 
                                 Textarea::make('service_name')
                                     ->label('Nama layanan')
                                     ->rows(3)
-                                    ->placeholder('Nama layanan merujuk pada nama layanan yang diberikan kepada pengguna atau masyarakat yang didigitalisasikan pada aplikasi ini'),
+                                    ->placeholder('Nama layanan merujuk pada nama layanan yang diberikan kepada pengguna atau masyarakat yang didigitalisasikan pada aplikasi ini')
+                                    ->required(),
 
                                 Select::make('service_type_id')
                                     ->label('Jenis Layanan SPBE')
                                     ->relationship('serviceType', 'name')
                                     ->searchable()
-                                    ->preload(),
+                                    ->preload()
+                                    ->required(),
 
                                 Select::make('user_count_range')
                                     ->label('Estimasi Jumlah Pengguna')
@@ -218,6 +250,7 @@ class ApplicationForm
                                         'di atas 25 sampai dengan 100 pengguna' => '26 – 100 pengguna',
                                         'di atas 100 pengguna' => '> 100 pengguna',
                                     ])
+                                    ->required()
                                     ->searchable(),
 
                                 Select::make('usage_frequency_id')
@@ -225,7 +258,8 @@ class ApplicationForm
                                     ->relationship('usageFrequency', 'name')
                                     ->searchable()
                                     ->preload()
-                                    ->live(),
+                                    ->live()
+                                    ->required(),
 
                                 TextInput::make('other_usage_frequency')
                                     ->label('Frekuensi Penggunaan Lainnya')
@@ -247,16 +281,47 @@ class ApplicationForm
                                             ->required()
                                             ->columnSpanFull(),
 
-                                        self::makeKseScoreField('kse_data.score_investment_value', '1. Nilai Investasi Sistem Elektronik', $kseScoreOptions),
-                                        self::makeKseScoreField('kse_data.score_operational_budget', '2. Total Anggaran Operasional Tahunan', $kseScoreOptions),
-                                        self::makeKseScoreField('kse_data.score_legal_compliance', '3. Kewajiban Kepatuhan Terhadap Peraturan / Regulasi', $kseScoreOptions),
-                                        self::makeKseScoreField('kse_data.score_cryptography_usage', '4. Penggunaan Teknik Kriptografi Khusus (BSSN)', $kseScoreOptions),
-                                        self::makeKseScoreField('kse_data.score_user_base', '5. Jumlah Pengguna Sistem Elektronik', $kseScoreOptions),
-                                        self::makeKseScoreField('kse_data.score_personal_data_processing', '6. Data Pribadi yang Dikelola Sistem Elektronik', $kseScoreOptions),
-                                        self::makeKseScoreField('kse_data.score_data_confidentiality', '7. Tingkat Klasifikasi / Kerahasiaan Data', $kseScoreOptions),
-                                        self::makeKseScoreField('kse_data.score_business_process_criticality', '8. Tingkat Kekritisan Proses Bisnis yang Didukung', $kseScoreOptions),
-                                        self::makeKseScoreField('kse_data.score_failure_impact', '9. Dampak Kegagalan Sistem Elektronik', $kseScoreOptions),
-                                        self::makeKseScoreField('kse_data.score_potential_loss', '10. Potensi Kerugian atau Dampak Negatif dari Insiden', $kseScoreOptions),
+                                        //self::makeKseScoreField('kse_data.score_investment_value', '1. Nilai Investasi Sistem Elektronik', $kseScoreOptions),
+                                        Radio::make('kse_data.score_investment_value')
+                                            ->label('1. Nilai Investasi Sistem Elektronik')
+                                            ->options($kseScoreOptions)
+                                            ->required(),
+                                        Radio::make('kse_data.score_operational_budget')
+                                            ->label('2. Total Anggaran Operasional Tahunan')
+                                            ->options($kseScoreOptions)
+                                            ->required(),
+                                        Radio::make('kse_data.score_legal_compliance')
+                                            ->label('3. Kewajiban Kepatuhan Terhadap Peraturan / Regulasi')
+                                            ->options($kseScoreOptions)
+                                            ->required(),
+                                        Radio::make('kse_data.score_cryptography_usage')
+                                            ->label('4. Penggunaan Teknik Kriptografi Khusus (BSSN)')
+                                            ->options($kseScoreOptions)
+                                            ->required(),
+                                        Radio::make('kse_data.score_user_base')
+                                            ->label('5. Jumlah Pengguna Sistem Elektronik')
+                                            ->options($kseScoreOptions)
+                                            ->required(),
+                                        Radio::make('kse_data.score_personal_data_processing')
+                                            ->label('6. Data Pribadi yang Dikelola Sistem Elektronik')
+                                            ->options($kseScoreOptions)
+                                            ->required(),
+                                        Radio::make('kse_data.score_data_confidentiality')
+                                            ->label('7. Tingkat Klasifikasi / Kerahasiaan Data')
+                                            ->options($kseScoreOptions)
+                                            ->required(),
+                                        Radio::make('kse_data.score_business_process_criticality')
+                                            ->label("8. Tingkat Kekritisan Proses Bisnis yang Didukung")
+                                            ->options($kseScoreOptions)
+                                            ->required(),
+                                        Radio::make('kse_data.score_failure_impact')
+                                            ->label("9. Dampak Kegagalan Sistem Elektronik")
+                                            ->options($kseScoreOptions)
+                                            ->required(),
+                                        Radio::make('kse_data.score_potential_loss')
+                                            ->label('10. Potensi Kerugian atau Dampak Negatif dari Insiden')
+                                            ->options($kseScoreOptions)
+                                            ->required(),
                                     ]),
 
                                 Section::make('Hasil Kalkulasi Skor & Predikat KSE')
@@ -293,15 +358,18 @@ class ApplicationForm
 
                                 TextInput::make('pic_nip')
                                     ->label('NIP PIC')
+                                    ->required()
                                     ->maxLength(30),
 
                                 TextInput::make('pic_position')
                                     ->label('Jabatan PIC')
                                     ->columnSpan(2)
+                                    ->required()
                                     ->maxLength(255),
 
                                 TextInput::make('pic_phone')
                                     ->label('Nomor Telepon / WhatsApp PIC')
+                                    ->required()
                                     ->maxLength(25),
 
                                 FileUpload::make('logo_file_path')
@@ -320,11 +388,12 @@ class ApplicationForm
                                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
                                     ->maxSize(5120)
                                     ->openable(false)
-                                    ->downloadable(false),
+                                    ->downloadable(false)
+                                    ->required(),
 
                                 Placeholder::make('private_files_links')
-                                    ->label('Akses Dokumen Private Tersimpan')
-                                    ->visible(fn(?Application $record) => $record && (filled($record->spt_file_path) || filled($record->business_process_file_path)))
+                                    ->label('Akses Dokumen Tersimpan')
+                                    ->visible(fn(?Application $record) => $record && filled($record->spt_file_path))
                                     ->content(function (?Application $record): HtmlString {
                                         if (!$record) {
                                             return new HtmlString('-');
@@ -334,13 +403,8 @@ class ApplicationForm
                                             $url = route('applications.files.show', ['application' => $record->id, 'type' => 'spt']);
                                             $links[] = '<a href="' . e($url) . '" target="_blank" class="text-primary-600 underline font-medium">Lihat / Unduh Dokumen SPT (' . e(basename($record->spt_file_path)) . ')</a>';
                                         }
-                                        if (filled($record->business_process_file_path)) {
-                                            $url = route('applications.files.show', ['application' => $record->id, 'type' => 'business-process']);
-                                            $links[] = '<a href="' . e($url) . '" target="_blank" class="text-primary-600 underline font-medium">Lihat / Unduh Dokumen Proses Bisnis (' . e(basename($record->business_process_file_path)) . ')</a>';
-                                        }
                                         return new HtmlString(implode(' &nbsp;|&nbsp; ', $links));
-                                    })
-                                    ->columnSpanFull(),
+                                    }),
 
                                 Textarea::make('user_privileges_note')
                                     ->label('Tulis Level Hak Akses (Privileges) yang ada pada aplikasi')

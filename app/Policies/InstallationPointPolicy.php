@@ -37,6 +37,11 @@ class InstallationPointPolicy
         return $authUser->can('Delete:InstallationPoint');
     }
 
+    public function deleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('DeleteAny:InstallationPoint');
+    }
+
     public function restore(AuthUser $authUser, InstallationPoint $installationPoint): bool
     {
         return $authUser->can('Restore:InstallationPoint');

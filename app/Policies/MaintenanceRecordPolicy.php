@@ -37,6 +37,11 @@ class MaintenanceRecordPolicy
         return $authUser->can('Delete:MaintenanceRecord');
     }
 
+    public function deleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('DeleteAny:MaintenanceRecord');
+    }
+
     public function restore(AuthUser $authUser, MaintenanceRecord $maintenanceRecord): bool
     {
         return $authUser->can('Restore:MaintenanceRecord');

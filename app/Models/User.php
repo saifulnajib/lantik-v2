@@ -13,7 +13,8 @@ use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasPanelShield;
+    use HasFactory, Notifiable, HasPanelShield;
+    use HasRoles;
 
     protected static function booted()
     {

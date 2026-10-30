@@ -32,7 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             //->login()
             ->login(SiapLogin::class)
-            ->topNavigation()
+            // ->topNavigation()
             ->colors([
                 'primary' => Color::Amber,
             ])

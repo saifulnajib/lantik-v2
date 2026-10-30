@@ -37,6 +37,11 @@ class ProgressUpdatePolicy
         return $authUser->can('Delete:ProgressUpdate');
     }
 
+    public function deleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('DeleteAny:ProgressUpdate');
+    }
+
     public function restore(AuthUser $authUser, ProgressUpdate $progressUpdate): bool
     {
         return $authUser->can('Restore:ProgressUpdate');

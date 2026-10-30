@@ -37,6 +37,11 @@ class LayananPolicy
         return $authUser->can('Delete:Layanan');
     }
 
+    public function deleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('DeleteAny:Layanan');
+    }
+
     public function restore(AuthUser $authUser, Layanan $layanan): bool
     {
         return $authUser->can('Restore:Layanan');

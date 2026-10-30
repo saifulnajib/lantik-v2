@@ -154,7 +154,7 @@ class ApplicationInfolist
                             ->label('No. Telp / WA')
                             ->placeholder('-'),
                         TextEntry::make('spt_file_path')
-                            ->label('Dokumen SPT (Private)')
+                            ->label('Dokumen SPT')
                             ->formatStateUsing(fn(?string $state) => filled($state) ? 'Lihat / Unduh SPT (' . basename($state) . ')' : 'Belum diunggah')
                             ->url(fn(Application $record) => filled($record->spt_file_path) ? route('applications.files.show', ['application' => $record->id, 'type' => 'spt']) : null, shouldOpenInNewTab: true)
                             ->color(fn(?string $state) => filled($state) ? 'primary' : 'gray')

@@ -4,92 +4,72 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\ElectronicSystemCategorization;
-use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ElectronicSystemCategorizationPolicy
 {
     use HandlesAuthorization;
-
-    private function isAdmin(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->hasAnyRole(['super_admin', 'admin', 'admin_kominfo'])
-            || in_array($user->role, ['super_admin', 'admin'], true);
+        return $authUser->can('ViewAny:ElectronicSystemCategorization');
     }
 
-    public function viewAny(User $user): bool
+    public function view(AuthUser $authUser, ElectronicSystemCategorization $electronicSystemCategorization): bool
     {
-        return $this->isAdmin($user)
-            || $user->role === 'opd'
-            || $user->can('ViewAny:ElectronicSystemCategorization')
-            || $user->can('view_any_electronic_system_categorization');
+        return $authUser->can('View:ElectronicSystemCategorization');
     }
 
-    public function view(User $user, ElectronicSystemCategorization $categorization): bool
+    public function create(AuthUser $authUser): bool
     {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        if ($user->opd_id && (int) $user->opd_id !== (int) $categorization->opd_id) {
-            return false;
-        }
-
-        return $user->role === 'opd'
-            || $user->can('View:ElectronicSystemCategorization')
-            || $user->can('view_electronic_system_categorization');
+        return $authUser->can('Create:ElectronicSystemCategorization');
     }
 
-    public function create(User $user): bool
+    public function update(AuthUser $authUser, ElectronicSystemCategorization $electronicSystemCategorization): bool
     {
-        return $this->isAdmin($user)
-            || $user->role === 'opd'
-            || $user->can('Create:ElectronicSystemCategorization')
-            || $user->can('create_electronic_system_categorization');
+        return $authUser->can('Update:ElectronicSystemCategorization');
     }
 
-    public function update(User $user, ElectronicSystemCategorization $categorization): bool
+    public function delete(AuthUser $authUser, ElectronicSystemCategorization $electronicSystemCategorization): bool
     {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        if ($user->opd_id && (int) $user->opd_id !== (int) $categorization->opd_id) {
-            return false;
-        }
-
-        return $user->role === 'opd'
-            || $user->can('Update:ElectronicSystemCategorization')
-            || $user->can('update_electronic_system_categorization');
+        return $authUser->can('Delete:ElectronicSystemCategorization');
     }
 
-    public function delete(User $user, ElectronicSystemCategorization $categorization): bool
+    public function deleteAny(AuthUser $authUser): bool
     {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        if ($user->opd_id && (int) $user->opd_id !== (int) $categorization->opd_id) {
-            return false;
-        }
-
-        return $categorization->verification_status === 'draft'
-            && ($user->can('Delete:ElectronicSystemCategorization') || $user->can('delete_electronic_system_categorization'));
+        return $authUser->can('DeleteAny:ElectronicSystemCategorization');
     }
 
-    public function restore(User $user, ElectronicSystemCategorization $categorization): bool
+    public function restore(AuthUser $authUser, ElectronicSystemCategorization $electronicSystemCategorization): bool
     {
-        return $this->isAdmin($user)
-            || $user->can('Restore:ElectronicSystemCategorization')
-            || $user->can('restore_electronic_system_categorization');
+        return $authUser->can('Restore:ElectronicSystemCategorization');
     }
 
-    public function forceDelete(User $user, ElectronicSystemCategorization $categorization): bool
+    public function forceDelete(AuthUser $authUser, ElectronicSystemCategorization $electronicSystemCategorization): bool
     {
-        return $this->isAdmin($user)
-            || $user->can('ForceDelete:ElectronicSystemCategorization')
-            || $user->can('force_delete_electronic_system_categorization');
+        return $authUser->can('ForceDelete:ElectronicSystemCategorization');
     }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:ElectronicSystemCategorization');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:ElectronicSystemCategorization');
+    }
+
+    public function replicate(AuthUser $authUser, ElectronicSystemCategorization $electronicSystemCategorization): bool
+    {
+        return $authUser->can('Replicate:ElectronicSystemCategorization');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:ElectronicSystemCategorization');
+    }
+
 }
-

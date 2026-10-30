@@ -37,6 +37,11 @@ class OpdPolicy
         return $authUser->can('Delete:Opd');
     }
 
+    public function deleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('DeleteAny:Opd');
+    }
+
     public function restore(AuthUser $authUser, Opd $opd): bool
     {
         return $authUser->can('Restore:Opd');

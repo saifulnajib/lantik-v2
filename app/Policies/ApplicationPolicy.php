@@ -4,92 +4,72 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Application;
-use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ApplicationPolicy
 {
     use HandlesAuthorization;
-
-    private function isAdmin(User $user): bool
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->hasAnyRole(['super_admin', 'admin', 'admin_kominfo'])
-            || in_array($user->role, ['super_admin', 'admin'], true);
+        return $authUser->can('ViewAny:Application');
     }
 
-    public function viewAny(User $user): bool
+    public function view(AuthUser $authUser, Application $application): bool
     {
-        return $this->isAdmin($user)
-            || $user->role === 'opd'
-            || $user->can('ViewAny:Application')
-            || $user->can('view_any_application');
+        return $authUser->can('View:Application');
     }
 
-    public function view(User $user, Application $application): bool
+    public function create(AuthUser $authUser): bool
     {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        if ($user->opd_id && (int) $user->opd_id !== (int) $application->opd_id) {
-            return false;
-        }
-
-        return $user->role === 'opd'
-            || $user->can('View:Application')
-            || $user->can('view_application');
+        return $authUser->can('Create:Application');
     }
 
-    public function create(User $user): bool
+    public function update(AuthUser $authUser, Application $application): bool
     {
-        return $this->isAdmin($user)
-            || $user->role === 'opd'
-            || $user->can('Create:Application')
-            || $user->can('create_application');
+        return $authUser->can('Update:Application');
     }
 
-    public function update(User $user, Application $application): bool
+    public function delete(AuthUser $authUser, Application $application): bool
     {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        if ($user->opd_id && (int) $user->opd_id !== (int) $application->opd_id) {
-            return false;
-        }
-
-        return $user->role === 'opd'
-            || $user->can('Update:Application')
-            || $user->can('update_application');
+        return $authUser->can('Delete:Application');
     }
 
-    public function delete(User $user, Application $application): bool
+    public function deleteAny(AuthUser $authUser): bool
     {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        if ($user->opd_id && (int) $user->opd_id !== (int) $application->opd_id) {
-            return false;
-        }
-
-        return $application->verification_status === 'draft'
-            && ($user->can('Delete:Application') || $user->can('delete_application'));
+        return $authUser->can('DeleteAny:Application');
     }
 
-    public function restore(User $user, Application $application): bool
+    public function restore(AuthUser $authUser, Application $application): bool
     {
-        return $this->isAdmin($user)
-            || $user->can('Restore:Application')
-            || $user->can('restore_application');
+        return $authUser->can('Restore:Application');
     }
 
-    public function forceDelete(User $user, Application $application): bool
+    public function forceDelete(AuthUser $authUser, Application $application): bool
     {
-        return $this->isAdmin($user)
-            || $user->can('ForceDelete:Application')
-            || $user->can('force_delete_application');
+        return $authUser->can('ForceDelete:Application');
     }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:Application');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:Application');
+    }
+
+    public function replicate(AuthUser $authUser, Application $application): bool
+    {
+        return $authUser->can('Replicate:Application');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:Application');
+    }
+
 }
-
