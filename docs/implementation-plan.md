@@ -105,9 +105,10 @@ Schema::create('applications', function (Blueprint $table) {
     $table->string('pic_phone', 25)->nullable();
     
     // Berkas & Dokumen Terkait
-    $table->string('spt_file_path')->nullable();
-    $table->string('logo_file_path')->nullable();
-    $table->string('business_process_file_path')->nullable();
+    $table->string('spt_file_path')->nullable(); // disimpan pada disk 'local' (storage/app/private)
+    $table->string('logo_file_path')->nullable(); // disimpan pada disk 'public' (storage/app/public)
+    $table->string('business_process_name')->nullable(); // proses_bisnis (nama proses bisnis)
+    $table->string('business_process_file_path')->nullable(); // disimpan pada disk 'local' (storage/app/private)
     $table->text('user_privileges_note')->nullable(); // level_privileges
     $table->text('future_plan')->nullable(); // rencana_aplikasi
     $table->string('asset_registration_number')->nullable(); // nomor_registrasi_aset
@@ -206,7 +207,8 @@ flowchart LR
 3. **Konversi Format Basis Aplikasi**:
    - Kolom lama `basis_aplikasi` berupa string koma (contoh: `"Website, Android,"`) dikonversi menjadi format array JSON native: `["web", "android"]`.
 4. **Validasi File Lampiran (SPT, Logo, Probis)**:
-   - Pastikan path file lama (`resources/data_aplikasi/...`) diarahkan ke storage disk Laravel (`storage/app/public/applications/...`).
+   - File **Logo** (`logo_file_path`) diarahkan ke disk `public` (`storage/app/public/applications/logos/...`).
+   - File **SPT** (`spt_file_path`) dan **Proses Bisnis / Probis** (`business_process_file_path`) disimpan pada disk `local` (`storage/app/private/applications/spt/...` dan `storage/app/private/applications/probis/...`) dan diakses melalui `ApplicationFileController` yang memvalidasi autentikasi & otorisasi pengguna.
 
 ---
 

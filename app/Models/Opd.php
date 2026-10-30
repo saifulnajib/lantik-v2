@@ -23,4 +23,19 @@ class Opd extends Model
     {
         return $this->hasMany(InstallationPoint::class);
     }
+
+    public function applications(): HasMany
+    {
+        return $this->hasMany(Application::class);
+    }
+
+    public function electronicSystemCategorizations(): HasMany
+    {
+        return $this->hasMany(ElectronicSystemCategorization::class);
+    }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
 }

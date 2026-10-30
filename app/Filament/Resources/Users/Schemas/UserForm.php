@@ -25,12 +25,18 @@ class UserForm
                     ->label('Role')
                     ->options([
                         'super_admin' => 'Super Admin',
-                        'admin' => 'Admin',
+                        'admin' => 'Admin Kominfo',
                         'vendor' => 'Vendor',
-                        'opd' => 'OPD',
+                        'opd' => 'Admin OPD',
                     ])
                     ->required()
                     ->default('vendor'),
+                \Filament\Forms\Components\Select::make('opd_id')
+                    ->label('OPD / Instansi')
+                    ->relationship('opd', 'nama')
+                    ->searchable()
+                    ->preload()
+                    ->nullable(),
                 TextInput::make('password')
                     ->password()
                     ->dehydrateStateUsing(fn($state) => \Illuminate\Support\Facades\Hash::make($state))

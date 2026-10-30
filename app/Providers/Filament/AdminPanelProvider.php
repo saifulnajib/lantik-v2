@@ -20,6 +20,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
+use App\Filament\Pages\Auth\SiapLogin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -29,7 +30,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            //->login()
+            ->login(SiapLogin::class)
             ->topNavigation()
             ->colors([
                 'primary' => Color::Amber,

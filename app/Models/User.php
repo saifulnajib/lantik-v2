@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -20,6 +21,9 @@ class User extends Authenticatable
             if ($user->isDirty('role') && filled($user->role)) {
                 $user->syncRoles([$user->role]);
             }
+            if (empty($user->opd_id) && filled($user->kode_opd)) {
+                $user->opd_id = Opd::where('kode', $user->kode_opd)->value('id');
+            }
         });
     }
 
@@ -33,7 +37,15 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'nip',
+        'kode_opd',
+        'opd_id',
     ];
+
+    public function opd(): BelongsTo
+    {
+        return $this->belongsTo(Opd::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
